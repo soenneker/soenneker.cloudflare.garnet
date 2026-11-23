@@ -1,0 +1,12 @@
+node_modules/
+.wrangler/
+.dev.vars*
+.env*
+__pycache__/
+*.pyc
+*.tar.gz
+*.pem
+*.key
+bin/
+obj/
+TestResults/

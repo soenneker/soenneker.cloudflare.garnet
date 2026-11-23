@@ -1,0 +1,16 @@
+{
+    "$schema": "./node_modules/wrangler/config-schema.json",
+    "name": "soenneker-cloudflare-garnet",
+    "main": "worker/index.js",
+    "compatibility_date": "2026-11-19",
+    "workers_dev": true,
+    "preview_urls": false,
+    "triggers": { "crons": ["*/5 * * * *"] },
+    "containers": [{
+        "class_name": "GarnetHost",
+        "scheduling_policy": "durable_object",
+        "images": { "garnet": { "dockerfile": "./container/Dockerfile" } }
+    }],
+    "durable_objects": { "bindings": [{ "name": "GARNET_HOST", "class_name": "GarnetHost" }] },
+    "migrations": [{ "tag": "v1", "new_sqlite_classes": ["GarnetHost"] }]
+}
