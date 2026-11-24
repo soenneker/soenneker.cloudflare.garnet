@@ -1,4 +1,4 @@
-FROM ghcr.io/microsoft/garnet:2.2.13@sha256:a5b11ca8292400a6239437c34c96aaa515a55ab3613ef2e41a33914405f89442
+FROM ghcr.io/microsoft/garnet:2.2.14@sha256:9ea4c7f379e0366e5647c94ddbe17710d3aba434a92d974658dd90e4a3efc4ed
 USER root
 RUN install -d -m 0700 -o app -g app /opt/garnet-runtime
 COPY start-garnet.sh wait-garnet.sh /usr/local/bin/
