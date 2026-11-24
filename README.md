@@ -48,10 +48,10 @@ The image pins Garnet 2.2.13 by digest and terminates TLS in Garnet. The applica
 
 ## Docker Hub releases
 
-Set the GitHub Actions repository secret `DOCKERHUB_TOKEN` to a Docker Hub access token for `soenneker` with write access to `soenneker/cloudflare-garnet`. Publish a GitHub release with a Docker-compatible tag such as `v1.2.3`. After the tests pass, the workflow pushes the tested Linux AMD64 image to Docker Hub and records its immutable digest in the job summary. The current stable GitHub release also updates the `latest` tag. Pull requests and manual build checks only build and test.
+Set the GitHub Actions repository secret `DOCKERHUB_TOKEN` to a Docker Hub access token for `soenneker` with write access to `soenneker/cloudflare-garnet`. Pushes to `main` that change the container build context, Git attributes, or the build workflow automatically publish `sha-<full-commit-sha>` and update `latest` after tests pass. Publishing a GitHub release adds its version tag, such as `v1.2.3`. After the tests pass, the workflow pushes the tested Linux AMD64 image to Docker Hub and records its immutable digest in the job summary. The current stable GitHub release also updates the `latest` tag. Pull requests and manual build checks only build and test.
 
 ```sh
-docker pull soenneker/cloudflare-garnet:v1.2.3
+docker pull soenneker/cloudflare-garnet:latest
 ```
 
 Cloudflare deployment is managed by the consuming account. To use a published release with Durable Object scheduling, pull the Docker Hub image by its release digest, tag it locally, and use `wrangler containers push` from the consuming account. Set the named image in that account's Wrangler configuration to its Cloudflare registry digest. The existing `npm run deploy` path also supports building directly from this repository's Dockerfile. [Cloudflare image management](https://developers.cloudflare.com/containers/guides/image-management/#use-an-external-image)
