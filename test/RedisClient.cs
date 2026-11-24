@@ -43,6 +43,27 @@ var result = await db.ScriptEvaluateAsync("redis.call('HSET', KEYS[1], 'job', 'q
 if ((long)result != 1 || await db.HashGetAsync("jobs", "job") != "queued")
     throw new InvalidOperationException("Job queue operations failed.");
 
+// A script's read and write must be atomic across independent client connections.
+const int clients = 8, increments = 80;
+const string counter = "lua-atomic-counter";
+const string increment = """
+    local n = tonumber(redis.call('GET', KEYS[1]))
+    -- Widen the overlap between concurrent scripts to exercise the read/modify/write race.
+    for i = 1, 40 do redis.call('GET', KEYS[1]) end
+    return redis.call('SET', KEYS[1], n + 1)
+    """;
+await db.StringSetAsync(counter, 0);
+await Task.WhenAll(Enumerable.Range(0, clients).Select(async _ =>
+{
+    using var client = await ConnectionMultiplexer.ConnectAsync(options);
+    IDatabase worker = client.GetDatabase();
+    for (int i = 0; i < increments; i++)
+        await worker.ScriptEvaluateAsync(increment, [new RedisKey(counter)]);
+}));
+long actual = (long)await db.StringGetAsync(counter);
+if (actual != clients * increments)
+    throw new InvalidOperationException($"Concurrent Lua updates lost: expected {clients * increments}, found {actual}.");
+
 if (!keys.GetAllElements().Any(element => element.Value == "api-key-ring-test"))
     throw new InvalidOperationException("The API data protection record was unreadable.");
 var claim = await jobs.Claim("engine", TimeSpan.FromMinutes(1), CancellationToken.None);

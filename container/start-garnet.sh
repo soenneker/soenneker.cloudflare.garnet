@@ -27,4 +27,4 @@ unset GARNET_PASSWORD TLS_CERT_PEM TLS_KEY_PEM digest
 
 exec /app/GarnetServer --bind 0.0.0.0 --port 6379 --tls \
     --cert-file-name "$PWD/tls.pem" --cert-password "$PWD/tls.key" --client-certificate-required false \
-    --auth ACL --acl-file "$PWD/users.acl" --lua --memory "${memory}m" --index 16m
+    --auth ACL --acl-file "$PWD/users.acl" --lua --lua-transaction-mode --memory "${memory}m" --index 16m
